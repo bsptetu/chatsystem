@@ -130,7 +130,7 @@
                 init : function(){
                     this.is_pc = Utils.isNwjs();
                     this.create();
-                    this.input.focus();
+                    //this.input.focus();
                     this.screenAdjust();
                 } ,
                 create : function(){

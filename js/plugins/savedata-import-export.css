@@ -1,0 +1,12 @@
+#savedata-import-export {
+    font-family: GameFont;
+    position: absolute;
+    left: 168px;
+    top: 152px;
+    width: 480px;
+    height: 320px;
+    resize: none;
+    z-index: 9;
+}
+
+

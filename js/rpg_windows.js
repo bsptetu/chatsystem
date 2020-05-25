@@ -1,5 +1,5 @@
 //=============================================================================
-// rpg_windows.js v1.6.2
+// rpg_windows.js v1.6.1 (community-1.3b)
 //=============================================================================
 
 //-----------------------------------------------------------------------------
@@ -385,13 +385,13 @@ Window_Base.prototype.processDrawIcon = function(iconIndex, textState) {
 
 Window_Base.prototype.makeFontBigger = function() {
     if (this.contents.fontSize <= 96) {
-        this.contents.fontSize += 5;
+        this.contents.fontSize += 12;
     }
 };
 
 Window_Base.prototype.makeFontSmaller = function() {
-    if (this.contents.fontSize >= 12) {
-        this.contents.fontSize -= 5;
+    if (this.contents.fontSize >= 24) {
+        this.contents.fontSize -= 12;
     }
 };
 
@@ -456,7 +456,7 @@ Window_Base.prototype.drawCharacter = function(characterName, characterIndex, x,
     var big = ImageManager.isBigCharacter(characterName);
     var pw = bitmap.width / (big ? 3 : 12);
     var ph = bitmap.height / (big ? 4 : 8);
-    var n = characterIndex;
+    var n = big ? 0: characterIndex;
     var sx = (n % 4 * 3 + 1) * pw;
     var sy = (Math.floor(n / 4) * 4) * ph;
     this.contents.blt(bitmap, sx, sy, pw, ph, x - pw / 2, y - ph);
@@ -2689,7 +2689,7 @@ Window_Options.prototype.drawItem = function(index) {
     this.resetTextColor();
     this.changePaintOpacity(this.isCommandEnabled(index));
     this.drawText(this.commandName(index), rect.x, rect.y, titleWidth, 'left');
-    this.drawText(this.statusText(index), titleWidth, rect.y, statusWidth, 'right');
+    this.drawText(this.statusText(index), rect.x+titleWidth, rect.y, statusWidth, 'right');
 };
 
 Window_Options.prototype.statusWidth = function() {
@@ -2812,8 +2812,8 @@ Window_SavefileList.prototype.maxVisibleItems = function() {
 };
 
 Window_SavefileList.prototype.itemHeight = function() {
-    var innerHeight = this.height - this.padding * 2;
-    return Math.floor(innerHeight / this.maxVisibleItems());
+    //var innerHeight = 1;this.height - this.padding * 2;
+    //return Math.floor(innerHeight / this.maxVisibleItems());
 };
 
 Window_SavefileList.prototype.drawItem = function(index) {
@@ -2834,7 +2834,14 @@ Window_SavefileList.prototype.drawItem = function(index) {
 };
 
 Window_SavefileList.prototype.drawFileId = function(id, x, y) {
-    this.drawText(TextManager.file + ' ' + id, x, y, 180);
+    if (DataManager.isAutoSaveFileId(id)) {
+        if (this._mode === 'save') {
+            this.changePaintOpacity(false);
+        }
+        this.drawText(TextManager.file + ' ' + id + '(Auto)', x, y, 180);
+    } else {
+        this.drawText(TextManager.file + ' ' + id, x, y, 180);
+    }
 };
 
 Window_SavefileList.prototype.drawContents = function(info, rect, valid) {
@@ -4289,6 +4296,8 @@ Window_Message.prototype.clearFlags = function() {
     this._showFast = false;
     this._lineShowFast = false;
     this._pauseSkip = false;
+    this._textSpeed = 0;
+    this._textSpeedCount = 0;
 };
 
 Window_Message.prototype.numVisibleRows = function() {
@@ -4408,8 +4417,13 @@ Window_Message.prototype.updateMessage = function() {
                 this.newPage(this._textState);
             }
             this.updateShowFast();
+            if (!this._showFast && !this._lineShowFast && this._textSpeedCount < this._textSpeed) {
+                this._textSpeedCount++;
+                break;
+            }
+            this._textSpeedCount = 0;
             this.processCharacter(this._textState);
-            if (!this._showFast && !this._lineShowFast) {
+            if (!this._showFast && !this._lineShowFast && this._textSpeed !== -1) {
                 break;
             }
             if (this.pause || this._waitCount > 0) {
@@ -4544,6 +4558,9 @@ Window_Message.prototype.processEscapeCharacter = function(code, textState) {
         break;
     case '^':
         this._pauseSkip = true;
+        break;
+    case 'S':
+        this._textSpeed = this.obtainEscapeParam(textState) - 1;
         break;
     default:
         Window_Base.prototype.processEscapeCharacter.call(this, code, textState);
@@ -5740,7 +5757,7 @@ Window_TitleCommand.initCommandPosition = function() {
 };
 
 Window_TitleCommand.prototype.windowWidth = function() {
-    return 240;
+    return 340;
 };
 
 Window_TitleCommand.prototype.updatePlacement = function() {
@@ -5750,8 +5767,8 @@ Window_TitleCommand.prototype.updatePlacement = function() {
 
 Window_TitleCommand.prototype.makeCommandList = function() {
     this.addCommand(TextManager.newGame,   'newGame');
-    this.addCommand(TextManager.continue_, 'continue', this.isContinueEnabled());
-    this.addCommand(TextManager.options,   'options');
+    this.addCommand(TextManager.continue_, 'continue');//, this.isContinueEnabled());
+//    this.addCommand(TextManager.options,   'options');
 };
 
 Window_TitleCommand.prototype.isContinueEnabled = function() {
