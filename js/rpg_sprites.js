@@ -1,5 +1,5 @@
 //=============================================================================
-// rpg_sprites.js v1.6.1 (community-1.3b)
+// rpg_sprites.js v1.6.2
 //=============================================================================
 
 //-----------------------------------------------------------------------------
@@ -901,7 +901,7 @@ Sprite_Actor.prototype.onMoveEnd = function() {
 };
 
 Sprite_Actor.prototype.damageOffsetX = function() {
-    return 0;
+    return -32;
 };
 
 Sprite_Actor.prototype.damageOffsetY = function() {
@@ -991,7 +991,7 @@ Sprite_Enemy.prototype.updatePosition = function() {
 };
 
 Sprite_Enemy.prototype.updateStateSprite = function() {
-    this._stateIconSprite.y = -Math.round((this.bitmap.height + 40) * 0.65);
+    this._stateIconSprite.y = -Math.round((this.bitmap.height + 40) * 0.9);
     if (this._stateIconSprite.y < 20 - this.y) {
         this._stateIconSprite.y = 20 - this.y;
     }
@@ -1548,7 +1548,7 @@ Sprite_Damage.prototype.createChildSprite = function() {
     var sprite = new Sprite();
     sprite.bitmap = this._damageBitmap;
     sprite.anchor.x = 0.5;
-    sprite.anchor.y = 0;1;
+    sprite.anchor.y = 1;
     sprite.y = -40;
     sprite.ry = sprite.y;
     this.addChild(sprite);
@@ -1622,7 +1622,7 @@ Sprite_StateIcon.prototype.initMembers = function() {
     this._animationCount = 0;
     this._animationIndex = 0;
     this.anchor.x = 0.5;
-    this.anchor.y = 0.7;
+    this.anchor.y = 0.5;
 };
 
 Sprite_StateIcon.prototype.loadBitmap = function() {
@@ -1697,7 +1697,7 @@ Sprite_StateOverlay.prototype.initMembers = function() {
     this._animationCount = 0;
     this._pattern = 0;
     this.anchor.x = 0.5;
-    this.anchor.y = 1.4;
+    this.anchor.y = 1;
 };
 
 Sprite_StateOverlay.prototype.loadBitmap = function() {
@@ -2170,7 +2170,6 @@ Spriteset_Base.prototype.createWebGLToneChanger = function() {
     var width = Graphics.width + margin * 2;
     var height = Graphics.height + margin * 2;
     this._toneFilter = new ToneFilter();
-    this._toneFilter.enabled = false;
     this._baseSprite.filters = [this._toneFilter];
     this._baseSprite.filterArea = new Rectangle(-margin, -margin, width, height);
 };
@@ -2227,13 +2226,8 @@ Spriteset_Base.prototype.updateToneChanger = function() {
 Spriteset_Base.prototype.updateWebGLToneChanger = function() {
     var tone = this._tone;
     this._toneFilter.reset();
-    if (tone[0] || tone[1] || tone[2] || tone[3]) {
-        this._toneFilter.enabled = true;
-        this._toneFilter.adjustTone(tone[0], tone[1], tone[2]);
-        this._toneFilter.adjustSaturation(-tone[3]);
-    } else {
-        this._toneFilter.enabled = false;
-    }
+    this._toneFilter.adjustTone(tone[0], tone[1], tone[2]);
+    this._toneFilter.adjustSaturation(-tone[3]);
 };
 
 Spriteset_Base.prototype.updateCanvasToneChanger = function() {
